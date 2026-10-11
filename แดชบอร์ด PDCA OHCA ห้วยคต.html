@@ -1,0 +1,416 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>แดชบอร์ด PDCA OHCA ห้วยคต</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: dark ECG header band → summary tiles → PDCA wheel + detail → to-scale case timelines → KPI table → roles / ACT / AED grid. PDCA four-hue system carries the colour; cardiac red marks the pre-EMS window. */
+:root{
+  --bg:#f3f6fb; --surface:#ffffff; --surface-2:#eef2f9; --ink:#14213a; --muted:#5a6680; --line:#dbe2ee;
+  --hero:#101a30; --hero-ink:#f1f4fb; --hero-muted:#a9b5cf;
+  --plan:#2b6be0; --do:#0f9b72; --check:#d98a0b; --act:#8447d6; --heart:#e0334b;
+  --plan-soft:#e3ecfc; --do-soft:#dcf3ea; --check-soft:#fbefd6; --act-soft:#eee4fb; --heart-soft:#fde3e7;
+  --f-display:"Anuphan","IBM Plex Sans Thai",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Thai","Anuphan",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0b1222; --surface:#131d33; --surface-2:#1a2640; --ink:#e7ecf6; --muted:#9aa7c2; --line:#25324e;
+  --hero:#070d1a; --hero-ink:#f1f4fb; --hero-muted:#93a1bf;
+  --plan:#5b93ff; --do:#2fcf9b; --check:#f6b13a; --act:#a97cf5; --heart:#ff5a70;
+  --plan-soft:#18284a; --do-soft:#11302a; --check-soft:#33280f; --act-soft:#271c45; --heart-soft:#3a1720;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b1222; --surface:#131d33; --surface-2:#1a2640; --ink:#e7ecf6; --muted:#9aa7c2; --line:#25324e;
+  --hero:#070d1a; --hero-ink:#f1f4fb; --hero-muted:#93a1bf;
+  --plan:#5b93ff; --do:#2fcf9b; --check:#f6b13a; --act:#a97cf5; --heart:#ff5a70;
+  --plan-soft:#18284a; --do-soft:#11302a; --check-soft:#33280f; --act-soft:#271c45; --heart-soft:#3a1720;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.25}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+/* hero */
+.hero{background:var(--hero);color:var(--hero-ink);padding-block:28px 0;position:relative;overflow:hidden}
+.hero .wrap{display:grid;gap:10px;position:relative;z-index:1}
+.eyebrow{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--hero-muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--heart);box-shadow:0 0 0 4px color-mix(in srgb,var(--heart) 30%,transparent);animation:beat 1.2s infinite}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.35)}30%{transform:scale(1)}}
+.hero h1{font-size:clamp(26px,4.4vw,44px);font-weight:700}
+.hero h1 em{font-style:normal;color:var(--heart)}
+.hero p{margin:0;color:var(--hero-muted);max-width:68ch}
+.pdca-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.chip{font-family:var(--f-display);font-weight:600;font-size:13px;padding:4px 12px;border-radius:999px;color:#fff}
+.ecg{display:block;width:100%;height:70px;margin-top:10px}
+.ecg path{fill:none;stroke:var(--heart);stroke-width:2.2;stroke-linejoin:round;stroke-dasharray:1400;stroke-dashoffset:0;animation:trace 4s linear infinite}
+@keyframes trace{from{stroke-dashoffset:1400}to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.ecg path,.dot{animation:none}}
+
+main{display:grid;gap:22px;padding-block:22px 40px}
+section{min-width:0}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.sec-head h2{font-size:21px;font-weight:700}
+.sec-head .note{color:var(--muted);font-size:13px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:-6px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:2px;border-top:4px solid var(--c)}
+.tile .k{font-size:12.5px;color:var(--muted)}
+.tile .v{font-family:var(--f-display);font-weight:700;font-size:30px;color:var(--c);line-height:1.15}
+.tile .v small{font-size:15px;font-weight:600;color:var(--ink);margin-left:4px}
+.tile .s{font-size:12.5px;color:var(--muted)}
+
+/* PDCA wheel */
+.pdca{display:grid;grid-template-columns:minmax(240px,320px) 1fr;gap:22px;align-items:center}
+@media (max-width:760px){.pdca{grid-template-columns:1fr}}
+.wheel{width:100%;max-width:320px;margin:0 auto;aspect-ratio:1}
+.wheel svg{width:100%;height:100%;display:block}
+.seg{cursor:pointer;transition:transform .2s,opacity .2s;transform-origin:160px 160px}
+.seg path{stroke:var(--surface);stroke-width:4}
+.seg text{fill:#fff;font-family:var(--f-display);font-weight:700;pointer-events:none}
+.seg .th{font-weight:500;font-family:var(--f-body)}
+.seg:not(.on){opacity:.55}
+.seg.on{transform:scale(1.04)}
+.seg:focus-visible{outline:none}
+.seg:focus-visible path{stroke:var(--ink)}
+.hub{fill:var(--surface)}
+.hub-t{fill:var(--ink);font-family:var(--f-display);font-weight:700}
+.hub-s{fill:var(--muted);font-family:var(--f-body)}
+.detail{display:grid;gap:12px;min-width:0}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{font:600 14px var(--f-display);border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 14px;border-radius:999px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--c);border-color:var(--c);color:#fff}
+.tab:focus-visible{outline:2px solid var(--c);outline-offset:2px}
+.dcard{border-radius:var(--r);padding:18px;background:var(--soft);border:1px solid color-mix(in srgb,var(--c) 30%,transparent)}
+.dcard h3{font-size:20px;color:var(--c);margin-bottom:6px}
+.dcard .task{margin:0 0 12px}
+.owner{display:flex;gap:8px;align-items:flex-start;font-size:14px}
+.owner b{font-family:var(--f-display);white-space:nowrap}
+.dcard ul{margin:10px 0 0;padding-left:20px}
+.dcard li{margin-bottom:4px}
+
+/* timelines */
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:14px;height:10px;border-radius:3px;display:inline-block}
+.tl-scroll{overflow-x:auto;margin-top:8px}
+.tl-scroll svg{min-width:660px;width:100%;display:block}
+.tl-label{font-family:var(--f-display);font-weight:700;font-size:14px;fill:var(--ink)}
+.tl-sub{font-size:11.5px;fill:var(--muted);font-family:var(--f-body)}
+.tl-time{font-family:var(--f-mono);font-size:11px;fill:var(--ink);font-weight:700}
+.tl-ev{font-size:11px;fill:var(--muted);font-family:var(--f-body)}
+.tl-axis{stroke:var(--line);stroke-width:1}
+.tl-tick{font-family:var(--f-mono);font-size:10.5px;fill:var(--muted)}
+.tl-dur{font-family:var(--f-mono);font-size:11px;font-weight:700;fill:#fff}
+.mk{fill:var(--surface);stroke:var(--ink);stroke-width:2}
+
+.cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:16px}
+.case{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;gap:12px;align-content:start;min-width:0}
+.case-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.case h3{font-size:18px}
+.case .who{color:var(--muted);font-size:13.5px}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--heart-soft);color:var(--heart);white-space:nowrap}
+.pill.amber{background:var(--check-soft);color:var(--check)}
+.ev{display:grid;grid-template-columns:54px 1fr;gap:4px 12px;margin:0;font-size:14px}
+.ev dt{font-family:var(--f-mono);font-weight:700;color:var(--plan)}
+.ev dd{margin:0}
+.rca{background:var(--heart-soft);border-radius:10px;padding:10px 14px;font-size:14px}
+.rca b{color:var(--heart);font-family:var(--f-display)}
+.rca ul{margin:4px 0 0;padding-left:18px}
+.next{display:grid;gap:6px;font-size:14px}
+.next div{display:flex;gap:8px;align-items:baseline}
+.tag{font:700 11px var(--f-display);letter-spacing:.04em;padding:2px 8px;border-radius:6px;color:#fff;min-width:56px;text-align:center}
+.gap{font-size:13px;color:var(--muted);border-left:3px solid var(--check);padding-left:10px}
+
+/* KPI table */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:640px}
+th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-display);font-weight:600;font-size:13px;color:var(--muted);background:var(--surface-2)}
+th:first-child{border-top-left-radius:10px} th:last-child{border-top-right-radius:10px}
+td:first-child{font-weight:600;white-space:nowrap}
+.target{font-family:var(--f-mono);font-weight:700;color:var(--check);white-space:nowrap}
+.status{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--surface-2);color:var(--muted);white-space:nowrap;border:1px dashed var(--line)}
+.bench{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:16px}
+.gauge{background:var(--check-soft);border-radius:12px;padding:14px 16px}
+.gauge .t{font-size:13.5px;font-weight:600}
+.bar{position:relative;height:12px;border-radius:999px;background:var(--surface);margin:10px 0 4px;overflow:hidden}
+.bar span{position:absolute;inset:0 auto 0 0;border-radius:999px;background:var(--check)}
+.scale em{position:absolute;transform:translateX(-50%);font-style:normal;color:var(--check);font-weight:700;white-space:nowrap}
+.scale{position:relative;display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+
+/* lower grid */
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.roles{display:grid;gap:10px}
+.role{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:12px;border-radius:10px;background:var(--do-soft)}
+.role .n{grid-row:span 2;width:30px;height:30px;border-radius:50%;background:var(--do);color:#fff;display:grid;place-items:center;font:700 14px var(--f-display)}
+.role b{font-family:var(--f-display)}
+.role p{margin:0;font-size:13.5px;color:var(--muted)}
+.acts{display:grid;gap:10px}
+.act{padding:12px 14px;border-radius:10px;background:var(--act-soft)}
+.act b{font-family:var(--f-display);color:var(--act);display:block}
+.act p{margin:2px 0 0;font-size:13.5px}
+.act small{color:var(--muted);font-size:12.5px}
+.aed{display:grid;gap:8px}
+.aed-item{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;background:var(--plan-soft);font-size:14px}
+.aed-ic{width:30px;height:30px;flex:none;border-radius:8px;background:var(--plan);display:grid;place-items:center}
+.aed-ic svg{width:18px;height:18px}
+.panel h3{font-size:17px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.panel h3 i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.foot{color:var(--muted);font-size:12.5px;display:grid;gap:6px}
+.foot a{color:var(--plan)}
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><span class="dot" aria-hidden="true"></span>EMS รพ.ห้วยคต · จ.อุทัยธานี · เขตสุขภาพที่ 3</div>
+    <h1>PDCA การช่วยชีวิต OHCA <em>CPR/AED ก่อน EMS ถึง</em></h1>
+    <p>ประชาชนและผู้ให้คำแนะนำทางโทรศัพท์ เน้นช่วงพบเหตุจนถึงผู้ปฏิบัติการ EMS คนแรกถึงตัวผู้ป่วย ทำงานร่วมกันระหว่าง EMS ศูนย์สั่งการ 1669 และผู้ดูแล AED</p>
+    <div class="pdca-chips">
+      <span class="chip" style="background:var(--plan)">PLAN วางแผน</span>
+      <span class="chip" style="background:var(--do)">DO ทดลองใช้</span>
+      <span class="chip" style="background:var(--check);color:#1b1300">CHECK ตรวจผล</span>
+      <span class="chip" style="background:var(--act)">ACT ปรับมาตรฐาน</span>
+    </div>
+  </div>
+  <svg class="ecg" viewBox="0 0 1200 70" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 40 H160 l12 -6 l10 6 H230 l8 18 l12 -52 l12 48 l8 -14 H330 l14 -8 l14 8 H520 l12 -6 l10 6 H570 l8 18 l12 -52 l12 48 l8 -14 H670 l14 -8 l14 8 H860 l12 -6 l10 6 H910 l8 18 l12 -52 l12 48 l8 -14 H1010 l14 -8 l14 8 H1200"/>
+  </svg>
+</header>
+
+<main class="wrap">
+
+  <section aria-label="สรุปภาพรวม" class="tiles">
+    <div class="tile" style="--c:var(--heart)"><span class="k">เคสทบทวน RCA</span><span class="v">2<small>ราย</small></span><span class="s">เม.ย. 2568 และ ก.ค. 2569</span></div>
+    <div class="tile" style="--c:var(--plan)"><span class="k">รับแจ้ง → ถึงจุดเกิดเหตุ</span><span class="v mono">11–15<small>นาที</small></span><span class="s">Case 1 = 11 · Case 2 = 15</span></div>
+    <div class="tile" style="--c:var(--check)"><span class="k">เป้ารับรู้ OHCA (AHA)</span><span class="v mono">&lt;90<small>วินาที</small></span><span class="s">มัธยฐาน รับสาย → รับรู้</span></div>
+    <div class="tile" style="--c:var(--check)"><span class="k">เป้าเริ่มกดตามคำแนะนำ</span><span class="v mono">&lt;150<small>วินาที</small></span><span class="s">มัธยฐาน รับสาย → กดครั้งแรก</span></div>
+    <div class="tile" style="--c:var(--do)"><span class="k">จุด AED ในพื้นที่</span><span class="v">6<small>จุด</small></span><span class="s">รพ.สต. 3 · อำเภอ · โรงเรียน · น้ำพุร้อน</span></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>วงจร PDCA</h2><span class="note">แตะแต่ละส่วนของวงล้อเพื่อดูงานและผู้รับผิดชอบ</span></div>
+    <div class="panel pdca">
+      <div class="wheel">
+        <svg viewBox="0 0 320 320" role="group" aria-label="วงล้อ PDCA">
+          <g class="seg" data-k="plan" tabindex="0" role="button" aria-label="PLAN วางแผน">
+            <path d="M160 160 L160 8 A152 152 0 0 1 312 160 Z" fill="var(--plan)"/>
+            <text x="222" y="104" text-anchor="middle" font-size="22">PLAN</text>
+            <text class="th" x="222" y="126" text-anchor="middle" font-size="13">วางแผน</text>
+          </g>
+          <g class="seg" data-k="do" tabindex="0" role="button" aria-label="DO ทดลองใช้">
+            <path d="M160 160 L312 160 A152 152 0 0 1 160 312 Z" fill="var(--do)"/>
+            <text x="222" y="222" text-anchor="middle" font-size="22">DO</text>
+            <text class="th" x="222" y="244" text-anchor="middle" font-size="13">ทดลองใช้</text>
+          </g>
+          <g class="seg" data-k="check" tabindex="0" role="button" aria-label="CHECK ตรวจผล">
+            <path d="M160 160 L160 312 A152 152 0 0 1 8 160 Z" fill="var(--check)"/>
+            <text x="98" y="222" text-anchor="middle" font-size="22">CHECK</text>
+            <text class="th" x="98" y="244" text-anchor="middle" font-size="13">ตรวจผล</text>
+          </g>
+          <g class="seg" data-k="act" tabindex="0" role="button" aria-label="ACT ปรับระบบ">
+            <path d="M160 160 L8 160 A152 152 0 0 1 160 8 Z" fill="var(--act)"/>
+            <text x="98" y="104" text-anchor="middle" font-size="22">ACT</text>
+            <text class="th" x="98" y="126" text-anchor="middle" font-size="13">ปรับระบบ</text>
+          </g>
+          <circle class="hub" cx="160" cy="160" r="54"/>
+          <text class="hub-t" x="160" y="156" text-anchor="middle" font-size="20">OHCA</text>
+          <text class="hub-s" x="160" y="176" text-anchor="middle" font-size="11.5">ก่อน EMS ถึง</text>
+        </svg>
+      </div>
+      <div class="detail">
+        <div class="tabs" role="tablist" aria-label="ขั้นตอน PDCA">
+          <button class="tab" role="tab" id="t-plan" data-k="plan" style="--c:var(--plan)">PLAN</button>
+          <button class="tab" role="tab" id="t-do" data-k="do" style="--c:var(--do)">DO</button>
+          <button class="tab" role="tab" id="t-check" data-k="check" style="--c:var(--check)">CHECK</button>
+          <button class="tab" role="tab" id="t-act" data-k="act" style="--c:var(--act)">ACT</button>
+        </div>
+        <div class="dcard" id="dcard" role="tabpanel" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>ไทม์ไลน์กรณีศึกษา</h2><span class="note">นับเป็นนาทีจากเวลารับแจ้ง วาดตามสเกลเดียวกัน</span></div>
+    <div class="panel">
+      <div class="legend">
+        <span><i style="background:var(--heart)"></i>รับแจ้ง → EMS ถึงจุดเกิดเหตุ (ช่วงที่ต้องการ CPR/AED จากประชาชน)</span>
+        <span><i style="background:var(--plan)"></i>EMS → ถึง ER</span>
+        <span><i style="background:var(--act)"></i>CPR ใน ER จนยุติ</span>
+      </div>
+      <div class="tl-scroll"><svg id="tl" viewBox="0 0 760 300" role="img" aria-label="ไทม์ไลน์เปรียบเทียบ Case 1 และ Case 2"></svg></div>
+    </div>
+
+    <div class="cases">
+      <article class="case">
+        <div class="case-top"><h3>Case 1 · การเริ่ม CPR ก่อนทีมถึง</h3><span class="pill">เสียชีวิต · ยุติ CPR 03.30 น.</span></div>
+        <div class="who">ชาย 70 ปี · HT / old MI · 2 เมษายน 2568</div>
+        <dl class="ev">
+          <dt>02.35</dt><dd>รับแจ้งอาเจียนเป็นเลือด ยังรู้สึกตัว</dd>
+          <dt>02.39</dt><dd>ญาติแจ้งไม่รู้สึกตัวและไม่หายใจ เจ้าหน้าที่แนะนำ CPR ทางโทรศัพท์</dd>
+          <dt>02.46</dt><dd>EMS ถึง พบไม่หายใจและไม่มีชีพจร</dd>
+          <dt>03.00</dt><dd>ถึง ER ทำ CPR ต่อ ต่อมาพบ Asystole</dd>
+        </dl>
+        <div class="rca"><b>ประเด็นจาก RCA</b>
+          <ul><li>มีคำแนะนำ CPR ทางโทรศัพท์ แต่ญาติไม่ได้เริ่มทำ</li><li>พื้นที่บ้านคับแคบ เคลื่อนย้ายลำบาก</li></ul>
+        </div>
+        <div class="next">
+          <div><span class="tag" style="background:var(--do)">DO</span>สอนในสายและยืนยันว่าเริ่มกด</div>
+          <div><span class="tag" style="background:var(--check);color:#1b1300">CHECK</span>บันทึกเวลาเริ่มกดจริง</div>
+          <div><span class="tag" style="background:var(--act)">ACT</span>ฝึก CPR กับญาติกลุ่มเสี่ยง</div>
+        </div>
+        <div class="gap">ข้อมูลเวลาเริ่ม CPR ณ จุดเกิดเหตุ และการใช้ AED ยังไม่ชัดเจน</div>
+      </article>
+
+      <article class="case">
+        <div class="case-top"><h3>Case 2 · ความพร้อม AED ในการออกรับ</h3><span class="pill">เสียชีวิต · CPR รวม 35 นาที</span></div>
+        <div class="who">ชาย 48 ปี · โรคหลอดเลือดหัวใจ / HTN / DLP · 15 กรกฎาคม 2569</div>
+        <dl class="ev">
+          <dt>01.50</dt><dd>รับแจ้งเหนื่อยและแน่นหน้าอก</dd>
+          <dt>01.52</dt><dd>ทีม ALS ออกจากฐาน</dd>
+          <dt>02.05</dt><dd>ถึงจุดเกิดเหตุ ไม่รู้สึกตัว ไม่มีชีพจร เริ่ม CPR และช่วยหายใจด้วยถุงลม</dd>
+          <dt>02.10</dt><dd>ถึง ER พบ Asystole และ CPR ต่อ</dd>
+        </dl>
+        <div class="rca"><b>ประเด็นจาก RCA</b>
+          <ul><li>ไม่ได้เตรียม AED ไป</li><li>ญาติไม่กล้า CPR</li></ul>
+        </div>
+        <div class="next">
+          <div><span class="tag" style="background:var(--do)">DO</span>ตรวจและนำ AED ออกรับทุกครั้ง</div>
+          <div><span class="tag" style="background:var(--check);color:#1b1300">CHECK</span>บันทึกเวลาติดแผ่น/วิเคราะห์</div>
+          <div><span class="tag" style="background:var(--act)">ACT</span>ซ้อมรับแจ้งและใช้งาน AED</div>
+        </div>
+        <div class="gap">ข้อมูลไม่ครบ ไม่สามารถสรุปว่าไม่มี CPR ของญาติก่อน EMS ถึง</div>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>CHECK ตัวชี้วัด CPR/AED ก่อน EMS ถึง</h2><span class="note">ใช้เวลาจากศูนย์สั่งการ ประวัติผู้พบเหตุ และ AED log</span></div>
+    <div class="panel">
+      <div class="bench">
+        <div class="gauge">
+          <div class="t">รับสาย → รับรู้ OHCA</div>
+          <div class="bar"><span style="width:37.5%"></span></div>
+          <div class="scale"><span>0</span><em style="left:37.5%">เป้า &lt;90 วิ</em><span>240 วิ</span></div>
+        </div>
+        <div class="gauge">
+          <div class="t">รับสาย → กดครั้งแรกตามคำแนะนำ</div>
+          <div class="bar"><span style="width:62.5%"></span></div>
+          <div class="scale"><span>0</span><em style="left:62.5%">เป้า &lt;150 วิ</em><span>240 วิ</span></div>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>ตัวชี้วัด</th><th>นิยาม / สิ่งที่บันทึก</th><th>การประเมิน</th><th>สถานะ</th></tr></thead>
+          <tbody>
+            <tr><td>เวลารับรู้ OHCA</td><td>รับสายที่ศูนย์สั่งการ ถึงรับรู้หัวใจหยุดเต้น บันทึกเวลารับสายแรก/รับต่อแยก</td><td><span class="target">มัธยฐาน &lt;90 วิ</span><br>AHA benchmark</td><td><span class="status">รอข้อมูล</span></td></tr>
+            <tr><td>เวลาเริ่มกดจากคำแนะนำ</td><td>รับสาย ถึงกดครั้งแรกที่ผู้รับแจ้งแนะนำ แยกกรณีกดอยู่ก่อนแล้ว</td><td><span class="target">มัธยฐาน &lt;150 วิ</span><br>AHA benchmark</td><td><span class="status">รอข้อมูล</span></td></tr>
+            <tr><td>CPR โดยประชาชน</td><td>เคสที่ประชาชนกดก่อน EMS ถึงตัว ÷ N บันทึกใช่/ไม่ใช่/ไม่ทราบ</td><td><span class="target">n/N, %</span><br>เทียบ baseline</td><td><span class="status">รอ baseline</span></td></tr>
+            <tr><td>AED ก่อน EMS ถึงตัว</td><td>เคสติดแผ่น AED ก่อน EMS ถึงตัว ÷ N เวลาใช้/first shock เฉพาะถ้าช็อกจริง</td><td><span class="target">n/N, %</span><br>เทียบ baseline</td><td><span class="status">รอ baseline</span></td></tr>
+            <tr><td>คุณภาพบทสอน</td><td>ประเมินคำถาม การจัดท่า/มือ จังหวะ ความลึก/recoil และยืนยันเริ่มกด</td><td>ทบทวนเสียงสาย เมื่อระบบมีบันทึก</td><td><span class="status">รอระบบบันทึก</span></td></tr>
+            <tr><td>ผลและอุปสรรค</td><td>ROSC/ชีพจรส่งมอบ แยกกัน เหตุที่ไม่เริ่มกด ข้อมูลไม่ทราบ และปัญหา AED</td><td>ทบทวนรายเคส ติดตามการแก้ไข</td><td><span class="status">ทบทวนรายเคส</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="foot" style="margin:12px 0 0">เกณฑ์เวลา AHA ใช้ทบทวนระบบ เริ่ม CPR ให้เร็วที่สุด และกำหนดเป้าหมายหน่วยจาก baseline · รายงานเวลาเป็นมัธยฐานและ P90 พร้อมจำนวนเคส</p>
+    </div>
+  </section>
+
+  <section class="grid3">
+    <div class="panel">
+      <h3><i style="background:var(--do)"></i>DO บทบาทระหว่างรอทีม EMS</h3>
+      <div class="roles">
+        <div class="role"><span class="n">1</span><b>ผู้รับแจ้ง / 1669</b><p>ยืนยันตำแหน่ง ส่งทีม สอนในสาย โค้ชต่อจนทีมถึง · บันทึกเวลาจริง</p></div>
+        <div class="role"><span class="n">2</span><b>ทีม EMS ระหว่างเดินทาง</b><p>รับข้อมูล CPR/AED และพิกัด เตรียม AED · ผู้ที่ไม่ขับรถเป็นผู้สื่อสาร</p></div>
+        <div class="role"><span class="n">3</span><b>ผู้ช่วยในที่เกิดเหตุ</b><p>นำ AED มา เปิดทางนำทีมเข้าถึง · คงผู้กดหน้าอกไว้</p></div>
+        <div class="role"><span class="n">4</span><b>ผู้กดหน้าอก</b><p>สลับคนกดประมาณทุก 2 นาทีถ้ามีผู้ช่วย ลดช่วงหยุดกด · กดต่อจนทีมพร้อมรับช่วง</p></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3><i style="background:var(--act)"></i>ACT ปัญหา → มาตรการ</h3>
+      <div class="acts">
+        <div class="act"><b>รับรู้ OHCA ช้า</b><p>ซ้อมคำถามการตอบสนองและหายใจปกติ ฝึกแยกเสียงหายใจเฮือก</p><small>ศูนย์สั่งการ/ผู้ฝึก · ตรวจเสียงสายรอบถัดไป</small></div>
+        <div class="act"><b>ผู้แจ้งกลัวหรือไม่เคยทำ</b><p>ใช้คำสั้นทีละขั้น โค้ชระหว่างกด ฝึกประชาชนด้วยหุ่นและ AED ฝึก</p><small>EMS/ผู้ฝึกในพื้นที่ · ตรวจเวลาถึงกดครั้งแรก</small></div>
+        <div class="act"><b>AED เข้าถึงไม่ได้</b><p>ทำรายการจุดติดตั้งและเวลาเปิด กำหนดผู้ถือกุญแจ แบตเตอรี่ และ pads</p><small>ผู้ดูแล AED/ท้องถิ่น · ตรวจการเข้าถึงซ้ำ</small></div>
+        <div class="act"><b>ข้อมูลเวลา/บทสอนไม่ครบ</b><p>เทียบเวลานาฬิกาและแบบบันทึก เชื่อมข้อมูลรับแจ้งกับรายงาน EMS</p><small>ผู้ดูแลทะเบียน/1669 · ตรวจความครบรอบถัดไป</small></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3><i style="background:var(--plan)"></i>จุด AED ในพื้นที่ห้วยคต</h3>
+      <div class="aed" id="aed"></div>
+      <p class="foot" style="margin:12px 0 0">ผู้ดูแล AED ในพื้นที่เป็นผู้รับผิดชอบหลักในขั้น ACT ร่วมกับ EMS และศูนย์สั่งการ</p>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div>แผน PDCA ระยะเวลา และผู้รับผิดชอบเป็นข้อเสนอให้หน่วยปรับตามระบบจริง ยังไม่มีข้อมูล baseline หรือผลลัพธ์จริงของโรงพยาบาล ข้อมูลกรณีศึกษามาจาก RCA รพ.ห้วยคต ปกปิดชื่อและ HN</div>
+    <div>อ้างอิง: <a href="https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/systems-of-care/" target="_blank" rel="noopener">AHA Systems of Care</a> · <a href="https://cpr.heart.org/en/resuscitation-science/telecommunicator-cpr/telecommunicator-cpr-recommendations-and-performance-measures" target="_blank" rel="noopener">AHA Telecommunicator CPR</a> · <a href="https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/adult-basic-life-support" target="_blank" rel="noopener">AHA Adult BLS</a></div>
+  </footer>
+</main>
+
+<script>
+(function(){
+  const D={
+    plan:{c:'var(--plan)',s:'var(--plan-soft)',t:'PLAN วางแผน',task:'เก็บข้อมูลเดิมและสำรวจ AED ที่เข้าถึงได้จริง เตรียมบทสอน 2 คำถามและการฝึกซ้อม',own:'หัวหน้างาน EMS · ศูนย์สั่งการ (นภัค) · แพทย์อำนวยการ (พญ.กันติชา)',li:['กลุ่มวิเคราะห์หลัก: OHCA ไม่ใช่อุบัติเหตุ อายุ 18 ปีขึ้นไป เกิดก่อน EMS ถึงตัว','แยกเด็ก อุบัติเหตุ จมน้ำ ขาดอากาศ และกรณี EMS เห็นการ arrest']},
+    do:{c:'var(--do)',s:'var(--do-soft)',t:'DO ทดลองใช้',task:'ประชาชนโทร 1669 เริ่ม CPR และใช้ AED ผู้รับแจ้งสอนในสายพร้อมส่งทีม',own:'ประชาชน / ผู้รับแจ้ง · ทีม EMS',li:['เปิดลำโพง สอนทีละขั้น และยืนยันว่าเริ่มกดแล้ว','เด็กและจมน้ำ: CPR ร่วมการช่วยหายใจตามบทสอนเฉพาะ']},
+    check:{c:'var(--check)',s:'var(--check-soft)',t:'CHECK ตรวจผล',task:'ตรวจเวลาเริ่มกดครั้งแรกและ bystander CPR ติดตามการติด AED ก่อน EMS ถึงตัว',own:'ทีมทบทวนเคส · ผู้ดูแลทะเบียน OHCA (รุ่งทิพย์)',li:['บันทึก ใช่/ไม่ใช่/ไม่ทราบ แยกรายงานข้อมูลที่ไม่ทราบ','รายงานมัธยฐานและ P90 พร้อมจำนวนเคส']},
+    act:{c:'var(--act)',s:'var(--act-soft)',t:'ACT ปรับระบบ',task:'แก้การสื่อสาร จุดเข้าถึง AED และการฝึก ติดตามซ้ำและกำหนด SOP ที่ได้ผล',own:'EMS / ศูนย์สั่งการ · ผู้ดูแล AED ในพื้นที่ 6 จุด',li:['ใช้ผลตรวจซ้ำปรับบทสอนและ SOP','ข้อมูลน้อยให้สะสมหลายเดือนก่อนสรุปอัตราผลลัพธ์']}
+  };
+  const card=document.getElementById('dcard');
+  function show(k){
+    const d=D[k];
+    card.style.setProperty('--c',d.c);card.style.setProperty('--soft',d.s);
+    card.innerHTML='<h3>'+d.t+'</h3><p class="task">'+d.task+'</p><div class="owner"><b>ผู้รับผิดชอบ</b><span>'+d.own+'</span></div><ul>'+d.li.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+    document.querySelectorAll('.seg').forEach(g=>g.classList.toggle('on',g.dataset.k===k));
+    document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.k===k));
+    try{localStorage.setItem('ohca-pdca',k)}catch(e){}
+  }
+  document.querySelectorAll('.seg,.tab').forEach(el=>{
+    el.addEventListener('click',()=>show(el.dataset.k));
+    el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show(el.dataset.k)}});
+  });
+  let start='plan';try{start=localStorage.getItem('ohca-pdca')||'plan'}catch(e){}
+  show(D[start]?start:'plan');
+
+  // AED list
+  const aed=['รพ.สต. แห่งที่ 1','รพ.สต. แห่งที่ 2','รพ.สต. แห่งที่ 3','ที่ว่าการอำเภอห้วยคต','โรงเรียนมัธยม','น้ำพุร้อนสมอทอง (แหล่งท่องเที่ยว)'];
+  const bolt='<svg viewBox="0 0 24 24" fill="#fff"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>';
+  document.getElementById('aed').innerHTML=aed.map(a=>'<div class="aed-item"><span class="aed-ic">'+bolt+'</span>'+a+'</div>').join('');
+
+  // Timeline, to scale (minutes from call)
+  const svg=document.getElementById('tl'),NS='http://www.w3.org/2000/svg';
+  const X0=130,X1=740,MAX=60,sx=m=>X0+(X1-X0)*m/MAX;
+  function el(n,a,txt){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;svg.appendChild(e);return e}
+  const cases=[
+    {y:90,name:'Case 1',sub:'ชาย 70 ปี · 2 เม.ย. 68',ev:[[0,'02.35','รับแจ้ง'],[4,'02.39','ไม่หายใจ · T-CPR'],[11,'02.46','EMS ถึง'],[25,'03.00','ถึง ER'],[55,'03.30','ยุติ CPR']],seg:[[0,11,'var(--heart)'],[11,25,'var(--plan)'],[25,55,'var(--act)']]},
+    {y:220,name:'Case 2',sub:'ชาย 48 ปี · 15 ก.ค. 69',ev:[[0,'01.50','รับแจ้ง'],[2,'01.52','ALS ออกฐาน'],[15,'02.05','EMS ถึง · เริ่ม CPR'],[20,'02.10','ถึง ER'],[50,'02.40','ยุติ CPR']],seg:[[0,15,'var(--heart)'],[15,20,'var(--plan)'],[20,50,'var(--act)']]}
+  ];
+  for(let m=0;m<=MAX;m+=10){
+    el('line',{x1:sx(m),x2:sx(m),y1:30,y2:278,class:'tl-axis','stroke-dasharray':m?'3 4':'0'});
+    el('text',{x:sx(m),y:294,'text-anchor':'middle',class:'tl-tick'},m+' นาที');
+  }
+  cases.forEach(c=>{
+    el('text',{x:0,y:c.y-2,class:'tl-label'},c.name);
+    el('text',{x:0,y:c.y+15,class:'tl-sub'},c.sub);
+    c.seg.forEach(([a,b,col])=>{
+      el('rect',{x:sx(a),y:c.y-9,width:sx(b)-sx(a),height:18,rx:4,fill:col});
+      let mid=(a+b)/2;const hit=c.ev.find(e=>e[0]>a&&e[0]<b&&Math.abs(e[0]-mid)<2.5);if(hit)mid=(hit[0]+b)/2;
+      if(sx(b)-sx(a)>36)el('text',{x:sx(mid),y:c.y+4,'text-anchor':'middle',class:'tl-dur'},(b-a)+' น.');
+    });
+    c.ev.forEach(([m,t,lab],i)=>{
+      const up=i%2===0,ty=up?c.y-44:c.y+34;
+      el('line',{x1:sx(m),x2:sx(m),y1:up?c.y-24:c.y+9,y2:up?c.y-9:c.y+20,stroke:'var(--muted)','stroke-width':1});
+      el('circle',{cx:sx(m),cy:c.y,r:4.5,class:'mk'});
+      const anchor=m===0?'start':'middle',ax=m===0?sx(m)-4:sx(m);
+      el('text',{x:ax,y:ty,'text-anchor':anchor,class:'tl-time'},t);
+      el('text',{x:ax,y:ty+14,'text-anchor':anchor,class:'tl-ev'},lab);
+    });
+  });
+})();
+</script>
+
+</body></html>
